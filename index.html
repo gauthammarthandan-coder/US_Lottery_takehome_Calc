@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>What's Your Jackpot Really Worth?</title>
+<style>
+  :root{
+    --bg:#0c0e13;--panel:#151921;--panel-2:#1c212b;--line:#2a313d;
+    --ink:#eef1f6;--muted:#8b93a3;--gold:#e8b54d;--gold-dim:#a8842f;
+    --teal:#3ec7b4;--red:#e8675a;--green:#52c785;--redsoft:#7a2e2e;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);
+    font-family:'Inter Tight',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    line-height:1.55;padding-bottom:60px}
+  .wrap{max-width:960px;margin:0 auto;padding:0 20px}
+
+  header{padding:52px 0 30px;border-bottom:1px solid var(--line)}
+  .brand{font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);font-weight:700}
+  h1{font-size:clamp(30px,5vw,52px);line-height:1.03;margin:14px 0 16px;font-weight:800;letter-spacing:-.025em}
+  h1 em{font-style:normal;color:var(--gold)}
+  .dek{color:#c3cad6;max-width:680px;font-size:16px}
+  .dek b{color:var(--ink)}
+  .byline{margin-top:18px;font-size:13px;color:var(--muted)}
+
+  section{padding:38px 0;border-bottom:1px solid var(--line)}
+  .kicker{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);font-weight:700;margin-bottom:10px}
+  h2{font-size:25px;font-weight:800;letter-spacing:-.02em;margin-bottom:13px}
+  p.body{color:#c3cad6;font-size:15px;max-width:700px;margin-bottom:12px}
+  p.body b{color:var(--ink)}
+
+  /* widget */
+  .widget{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:24px;margin-top:8px}
+  .toggles{display:flex;gap:18px;flex-wrap:wrap;margin-bottom:18px}
+  .tgroup{display:flex;flex-direction:column;gap:6px}
+  .tgroup .tlabel{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+  .seg{display:inline-flex;background:var(--panel-2);border:1px solid var(--line);border-radius:999px;padding:3px}
+  .seg button{background:transparent;border:none;color:var(--muted);padding:7px 15px;border-radius:999px;
+    font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap}
+  .seg button.on{background:var(--gold);color:#1a1407}
+  .wtop{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end}
+  .field{flex:1;min-width:150px}
+  label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px;font-weight:600}
+  select{width:100%;background:var(--panel-2);border:1px solid var(--line);color:var(--ink);
+    padding:11px 13px;border-radius:9px;font-size:15px;font-family:inherit}
+  select:focus{outline:none;border-color:var(--gold)}
+
+  /* two headline numbers */
+  .heads{margin-top:22px;display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:560px){.heads{grid-template-columns:1fr}}
+  .head{background:var(--panel-2);border-radius:12px;padding:20px}
+  .head.keep{border-left:3px solid var(--green)}
+  .head.lost{border-left:3px solid var(--red)}
+  .head .hl{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600}
+  .head .hv{font-size:34px;font-weight:800;letter-spacing:-.02em;margin:6px 0 2px;font-variant-numeric:tabular-nums}
+  .head.keep .hv{color:var(--green)} .head.lost .hv{color:var(--red)}
+  .head .hs{font-size:13px;color:var(--muted)}
+  .rankline{font-size:14px;color:var(--ink);margin-top:4px;font-weight:600}
+  .rankline b{color:var(--teal)}
+
+  /* tabs */
+  .tabs{display:flex;gap:6px;margin-top:22px;margin-bottom:0}
+  .tabs button{flex:1;background:var(--panel-2);border:1px solid var(--line);color:var(--muted);
+    padding:12px;border-radius:10px 10px 0 0;font-size:13.5px;font-weight:700;cursor:pointer;font-family:inherit}
+  .tabs button.on{background:var(--panel);color:var(--ink);border-bottom-color:var(--panel)}
+  .tabpane{background:var(--panel);border:1px solid var(--line);border-radius:0 0 12px 12px;padding:20px;margin-top:-1px}
+  .tabpane.hidden{display:none}
+  .cgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  @media(max-width:680px){.cgrid{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:400px){.cgrid{grid-template-columns:1fr}}
+  .ccard{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:15px}
+  .ccard.lost{border-color:rgba(232,103,90,.25)}
+  .ccard .cbig{font-size:24px;font-weight:800;color:var(--ink);font-variant-numeric:tabular-nums;line-height:1.05}
+  .ccard.lost .cbig{color:var(--red)}
+  .ccard .clbl{font-size:12.5px;color:#c3cad6;margin-top:5px;line-height:1.35}
+  .ccard .clbl b{color:var(--ink)}
+  .ccard .csub{font-size:11px;color:var(--muted);margin-top:3px}
+  .paneintro{font-size:13.5px;color:var(--muted);margin-bottom:14px}
+  .paneintro b{color:var(--ink)}
+
+  /* international */
+  .intl{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:24px;margin-top:8px}
+  .intl .ihd{font-size:15px;color:#c3cad6;margin-bottom:18px;max-width:700px}
+  .intl .ihd b{color:var(--ink)}
+  .ibar{display:flex;align-items:center;gap:12px;margin:9px 0}
+  .ibar .iname{width:130px;font-size:13px;font-weight:600;color:var(--ink);flex-shrink:0}
+  .ibar .itrack{flex:1;height:26px;background:var(--panel-2);border-radius:6px;overflow:hidden;display:flex}
+  .ibar .ifill{height:100%;display:flex;align-items:center;padding-left:10px;font-size:12px;font-weight:700;color:#0c0e13;white-space:nowrap}
+  .ibar .ikeep{background:var(--green)} .ibar .ius{background:var(--gold)}
+  .ibar .iamt{font-size:13px;font-weight:700;color:var(--muted);width:74px;text-align:right;flex-shrink:0;font-variant-numeric:tabular-nums}
+  .intl .ifoot{font-size:12px;color:var(--muted);margin-top:14px;line-height:1.5}
+  @media(max-width:520px){
+    .ibar{flex-wrap:wrap;gap:6px}.ibar .iname{width:100%}.ibar .itrack{flex:1;min-width:0}
+    .ibar .iamt{width:64px;font-size:12px}.ibar .ifill{font-size:11px;padding-left:7px}
+  }
+
+  /* tables */
+  .tablewrap{margin-top:8px;border:1px solid var(--line);border-radius:14px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  table{width:100%;border-collapse:collapse;font-size:14px;min-width:820px}
+  th{background:var(--panel-2);text-align:left;padding:12px 14px;font-size:11px;letter-spacing:.06em;
+    text-transform:uppercase;color:var(--muted);font-weight:700}
+  td{padding:11px 14px;border-top:1px solid var(--line);font-variant-numeric:tabular-nums}
+  tr:hover td{background:var(--panel)} tr.me td{background:rgba(232,181,77,.08)}
+  .rk{color:var(--muted);font-weight:700;width:38px} .st{font-weight:600}
+  .stackbar{display:inline-flex;height:9px;border-radius:3px;overflow:hidden;width:90px;vertical-align:middle;margin-left:8px;background:#222}
+  .stackbar .fed{background:var(--gold-dim)} .stackbar .sta{background:var(--red)}
+  .brk{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+  .brk .fp{color:var(--gold)} .brk .sp{color:var(--red)}
+  .toggle{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+  .toggle button{background:transparent;border:1px solid var(--line);color:var(--muted);padding:7px 13px;
+    border-radius:999px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit}
+  .toggle button.on{background:var(--gold);color:#1a1407;border-color:var(--gold)}
+  .method{font-size:12.5px;color:var(--muted);line-height:1.6;margin-top:10px}
+  .disc{font-size:12px;color:#6b7280;margin-top:24px;line-height:1.6}
+
+  .twocol{display:grid;grid-template-columns:1fr;gap:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- HERO -->
+  <header>
+    <div class="brand">VegasInsider · Data Study</div>
+    <h1>What's your jackpot <em>really</em> worth?</h1>
+    <p class="dek" style="font-size:18px;color:var(--ink);font-weight:600;margin-bottom:14px">It depends where you live in the US.</p>
+    <p class="dek">Win a $200M jackpot in the <b>UK, Canada or Australia</b> and you'd keep every penny — they don't tax lottery prizes. In the US you can't: the federal government takes ~37% no matter where you live. And then <b>your state can pile on more</b> — nothing in Texas, but millions in New York. This study shows two things for every state: <b>how much of your jackpot vanishes to tax</b>, and <b>how far what's left actually goes</b> where you live.</p>
+    <p class="byline">VegasInsider analysis · 2026 tax &amp; cost-of-living data · figures on the $200M lump-sum cash option</p>
+  </header>
+
+  <!-- INTERNATIONAL -->
+  <section>
+    <div class="kicker">First — the part no American escapes</div>
+    <h2>Win almost anywhere else, and you'd keep it all</h2>
+    <div class="intl">
+      <div class="ihd">The same $200M jackpot (cash value), by where you won it. Abroad you keep 100%. In the US, the federal cut lands before your state takes a cent — and your state decides the rest.</div>
+      <div id="intlbars"></div>
+      <div class="ifoot">"US — best state" is any no-tax state (federal only). "US — worst (NYC)" adds New York State + city tax. Simply being American already costs a winner tens of millions a UK or Canadian winner keeps.</div>
+    </div>
+  </section>
+
+  <!-- CALCULATOR -->
+  <section>
+    <div class="kicker">Your jackpot</div>
+    <h2>Pick your game, state and city</h2>
+    <div class="widget">
+      <div class="toggles">
+        <div class="tgroup"><span class="tlabel">Game</span>
+          <div class="seg" id="game"><button class="on" data-v="pb">Powerball</button><button data-v="mm">Mega Millions</button></div></div>
+        <div class="tgroup"><span class="tlabel">Jackpot</span>
+          <div class="seg" id="jackpot"><button data-v="100000000">$100M</button><button class="on" data-v="200000000">$200M</button><button data-v="500000000">$500M</button><button data-v="1000000000">$1B</button></div></div>
+      </div>
+      <div class="wtop">
+        <div class="field"><label>Your state</label><select id="state"></select></div>
+        <div class="field"><label>Your city <span style="opacity:.6">(optional)</span></label><select id="city"><option value="">Statewide average</option></select></div>
+      </div>
+
+      <div class="heads">
+        <div class="head keep">
+          <div class="hl">You take home</div>
+          <div class="hv" id="takehome">$60.5M</div>
+          <div class="hs" id="takesub">of the $96M cash value, after all tax</div>
+          <div class="rankline" id="valrank"></div>
+        </div>
+        <div class="head lost">
+          <div class="hl">You lose to tax</div>
+          <div class="hv" id="lost">$35.5M</div>
+          <div class="hs" id="lostsub">federal + state combined</div>
+          <div class="rankline" id="lostrank"></div>
+        </div>
+      </div>
+
+      <div class="tabs">
+        <button class="on" data-tab="can">What your winnings can buy</button>
+        <button data-tab="lost">What the tax cost you</button>
+      </div>
+      <div class="tabpane" id="pane-can">
+        <div class="paneintro">What your <b>take-home</b> could buy or fund where you live:</div>
+        <div class="cgrid" id="grid-can"></div>
+      </div>
+      <div class="tabpane hidden" id="pane-lost">
+        <div class="paneintro">The money <b>lost to tax</b> could instead have covered:</div>
+        <div class="cgrid" id="grid-lost"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RANKING A: MOST LOST -->
+  <section>
+    <div class="kicker">Ranking 1 · the tax bite</div>
+    <h2>Where winners lose the most to tax</h2>
+    <p class="body">Every US winner loses the same <b>37% federal</b>. Your state stacks on top — nothing in nine states, up to ~11% (almost 15% in NYC). Ranked by total lost on a $200M jackpot.</p>
+    <div class="toggle">
+      <button class="on" data-sortA="worst">Most lost first</button>
+      <button data-sortA="best">Least lost first</button>
+    </div>
+    <div class="tablewrap"><table>
+      <thead><tr><th class="rk">#</th><th>State</th><th>Total lost (fed + state)</th><th>Rent yrs</th><th>Childcare yrs</th><th>Degrees</th><th>Salary yrs</th></tr></thead>
+      <tbody id="tbodyA"></tbody>
+    </table></div>
+    <p class="method">Total lost = 37% federal (held constant) + each state's top rate on winnings, on the ≈$96M cash value of a $200M jackpot. NYC/Yonkers add local tax. Comparisons use each state's median home value, median household income and average in-state public tuition. Identical order for Powerball &amp; Mega Millions. Estimate only — not tax advice.</p>
+  </section>
+
+  <!-- RANKING B: BEST VALUE -->
+  <section style="border-bottom:none">
+    <div class="kicker">Ranking 2 · the surprise</div>
+    <h2>Where a win goes furthest</h2>
+    <p class="body">Lowest tax isn't the whole story. A dollar stretches further in some states than others — so we rank by <b>real value</b>: your after-tax take-home adjusted for local cost of living. Watch the flip: some states that <em>charge</em> tax beat no-tax states, because life is cheaper. California has zero lottery tax but lands near the bottom — your winnings just don't go as far.</p>
+    <div class="toggle">
+      <button class="on" data-sortB="best">Goes furthest first</button>
+      <button data-sortB="worst">Goes least far first</button>
+    </div>
+    <div class="tablewrap"><table>
+      <thead><tr><th class="rk">#</th><th>State</th><th>Real value</th><th>Take-home</th><th>Homes</th><th>Acres</th><th>Yrs no work</th><th>State tax</th></tr></thead>
+      <tbody id="tbodyB"></tbody>
+    </table></div>
+    <p class="method">Real value = after-tax take-home ÷ (state cost-of-living index ÷ 100). Cost-of-living index from MERIC / World Population Review 2026 (US average = 100). This is why no-tax states don't tie — a dollar is worth more in a cheaper state. Estimate only — not tax/financial advice.</p>
+  </section>
+
+  <!-- METHODOLOGY -->
+  <section style="border-bottom:none">
+    <div class="kicker">Methodology &amp; sources</div>
+    <h2>How we calculated this</h2>
+    <p class="body"><b>The jackpot figure.</b> Advertised jackpots are the annuity value — the full amount paid over 30 graduated annual payments. Most winners take the lump-sum "cash option" instead, which is roughly 48% of the headline (it varies with interest rates and by game). All figures here use that cash value: a $200M advertised jackpot is modelled as ≈$96M cash.</p>
+    <p class="body"><b>The tax.</b> We apply the top federal rate of 37% to the cash value (held constant for every state, since federal tax is the same nationwide), then subtract each state's top tax rate on lottery winnings. Nine states take nothing. New York City and Yonkers add a local tax on top of the state rate. At smaller prizes the effective federal rate is lower than 37% and the lottery only withholds above $5,000 — so these figures describe large jackpots, where the top rate applies.</p>
+    <p class="body"><b>"Real value" (Ranking 2).</b> Take-home dollars don't buy the same amount everywhere. We divide each state's after-tax take-home by its cost-of-living index (national average = 100) to get purchasing-power-adjusted value. This is what ranks the states — and it's why the nine no-tax states don't tie: a dollar stretches further in a cheaper state.</p>
+    <p class="body"><b>What the money buys / costs.</b> The two tabs translate the dollars into local terms. <b>What your winnings can buy</b> (your take-home): homes you could buy outright, acres of land, and years you could live without working (take-home ÷ local annual living cost). <b>What the tax cost you</b> (the total lost): years of rent, years of childcare, full four-year college degrees funded, and years of an average local salary. A four-year degree is counted as a complete cost per person (tuition × 4), since it's a one-off, not an ongoing bill.</p>
+    <p class="body"><b>Sources.</b> State tax rates: 2026 published state withholding/income-tax data. Income, rent &amp; home values: U.S. Census Bureau ACS and Zillow/NAR 2026. Cost-of-living index and local annual spend: MERIC / World Population Review 2026 (US average = 100). Tuition: College Board / IPEDS. Childcare: Child Care Aware of America. Land values: USDA / state agricultural land averages. International tax treatment: national tax authorities (the UK, Canada, Australia, New Zealand and others do not tax lottery prizes).</p>
+    <p class="body"><b>Limitations.</b> Every figure is an estimate for illustration. Real tax depends on filing status, deductions, other income and professional advice. Cash-value percentages move with interest rates. Cost-of-living, childcare and tuition averages vary within a state. The rankings are the same for Powerball and Mega Millions because state tax and cost of living don't depend on which game you win. This is not tax or financial advice.</p>
+  </section>
+
+  <p class="disc">For informational and entertainment purposes only. Tax figures are estimates based on 2026 federal rates and top state rates on lottery winnings; they exclude deductions, filing status and most local taxes (NYC/Yonkers noted). Lump-sum cash value approximated at ~48% of the advertised annuity and varies with interest rates. Home, income, rent, tuition, childcare and cost-of-living figures from public sources (Census/ACS, Zillow/NAR, Child Care Aware, MERIC) and are approximate. Consult a qualified tax professional. Please play responsibly.</p>
+</div>
+
+<script>
+const FED=0.37, RATIO={pb:0.48, mm:0.49};
+// [name, stateRate, localRate, income, home, rentYr, tuitionYr, childcareYr, colIndex]
+const S=[
+  ["Alaska",0,0,89740,375000,15600,8200,11700,125],
+  ["Florida",0,0,77735,395000,18000,6400,10600,103],
+  ["Texas",0,0,79061,310000,15600,11000,9700,93],
+  ["California",0,0,101000,809000,22800,14200,16500,142],
+  ["Tennessee",0,0,72100,330000,13200,11000,9200,90],
+  ["Washington",0,0,98000,627000,19200,12200,14600,114],
+  ["South Dakota",0,0,73900,295000,10800,9300,7600,92],
+  ["Wyoming",0,0,77000,340000,11400,6600,11200,92],
+  ["New Hampshire",0,0,96000,528000,17400,17200,13900,110],
+  ["North Dakota",0.029,0,79000,290000,10800,9300,9400,94],
+  ["Pennsylvania",0.0307,0,79000,275000,14400,15600,11800,102],
+  ["Indiana",0.0315,0,72000,245000,12000,10500,8900,91],
+  ["Ohio",0.0399,0,70000,235000,12000,11200,9700,94],
+  ["Arizona",0.025,0,77300,430000,17400,12700,11500,108],
+  ["Louisiana",0.0425,0,60000,249000,12600,9800,7100,91],
+  ["Missouri",0.04,0,71000,258000,12000,9900,9200,89],
+  ["Colorado",0.044,0,92900,568000,19200,12000,16600,105],
+  ["Arkansas",0.044,0,58700,230000,10800,9400,7000,89],
+  ["Michigan",0.0425,0,72000,260000,12600,14400,10600,91],
+  ["Kentucky",0.04,0,64000,263000,11400,11600,8200,93],
+  ["Oklahoma",0.0475,0,64000,235000,11400,9500,9400,86],
+  ["Mississippi",0.05,0,59100,210000,11400,9200,6800,87],
+  ["Massachusetts",0.05,0,113900,686000,20400,14000,21000,141],
+  ["North Carolina",0.045,0,72000,340000,14400,7400,9500,96],
+  ["Kansas",0.057,0,73000,250000,11400,10000,11000,87],
+  ["Nebraska",0.0584,0,76000,289000,11400,9500,12000,91],
+  ["New Mexico",0.059,0,62000,310000,12000,8000,8700,94],
+  ["West Virginia",0.0512,0,60000,170000,10200,9300,8400,88],
+  ["Virginia",0.0575,0,92000,400000,17400,14500,14000,100],
+  ["Idaho",0.058,0,76000,470000,13200,8300,8500,99],
+  ["Illinois",0.0495,0,82000,275000,14400,15200,14000,92],
+  ["Connecticut",0.0699,0,93000,420000,17400,14400,15500,114],
+  ["Iowa",0.06,0,73000,240000,11400,9800,10800,90],
+  ["South Carolina",0.064,0,67000,360000,14400,12700,9000,96],
+  ["Delaware",0.066,0,82000,390000,15600,13700,11500,102],
+  ["Montana",0.0675,0,72000,523000,12000,7500,9700,103],
+  ["Maine",0.0715,0,73000,400000,13800,11800,11200,111],
+  ["Rhode Island",0.0599,0,89000,507000,16800,13800,14500,111],
+  ["Wisconsin",0.0765,0,75000,300000,12600,10700,12500,95],
+  ["Vermont",0.0875,0,81000,420000,14400,18800,13000,115],
+  ["Georgia",0.0549,0,76000,350000,15600,8000,9500,91],
+  ["Maryland",0.0895,0,102900,440000,19200,10800,15700,116],
+  ["Minnesota",0.0985,0,87000,345000,14400,13300,16000,94],
+  ["Oregon",0.099,0,81000,515000,18000,12300,13900,114],
+  ["New Jersey",0.1075,0,104300,589000,19200,15000,13000,113],
+  ["District of Columbia",0.1075,0,109700,765000,22800,6200,24200,141],
+  ["New York",0.109,0,84000,488000,18000,8500,15400,125],
+  ["New York City",0.109,0.03876,84000,488000,24000,8500,18200,187]
+];
+const idx={rate:1,local:2,income:3,home:4,rent:5,tuition:6,childcare:7,col:8};
+
+// Avg price per acre of rural/agricultural+rural-residential land by state ($). Estimates — verify before publish.
+const LAND={
+  "Alaska":3500,"Florida":9000,"Texas":4200,"California":12000,"Tennessee":7000,"Washington":7500,
+  "South Dakota":2800,"Wyoming":1500,"New Hampshire":9000,"North Dakota":2500,"Pennsylvania":8000,
+  "Indiana":7500,"Ohio":7800,"Arizona":4000,"Louisiana":4500,"Missouri":5000,"Colorado":4500,
+  "Arkansas":4000,"Michigan":6000,"Kentucky":6000,"Oklahoma":3500,"Mississippi":4000,"Massachusetts":14000,
+  "North Carolina":8000,"Kansas":3000,"Nebraska":3500,"New Mexico":2000,"West Virginia":5000,"Virginia":9000,
+  "Idaho":4000,"Illinois":9500,"Connecticut":13000,"Iowa":9000,"South Carolina":7000,"Delaware":11000,
+  "Montana":1800,"Maine":4500,"Rhode Island":15000,"Wisconsin":6000,"Vermont":7000,"Georgia":7000,
+  "Maryland":12000,"Minnesota":6000,"Oregon":5000,"New Jersey":16000,"District of Columbia":1000000,
+  "New York":8000,"New York City":1000000
+};
+// National baseline: avg US household annual expenditure (~$77K). Scaled by each state's COL index.
+const US_ANNUAL_SPEND=77000;
+const DEGREE_TOTAL_KEY="degree"; // full 4-yr degree cost = tuition x 4
+
+const CITY={
+  "California":[["Los Angeles",80366,910000,158],["San Francisco",141446,1250000,180],["San Diego",104321,900000,150],["Fresno",62921,380000,110],["Sacramento",78954,480000,125]],
+  "Texas":[["Houston",62894,270000,96],["Austin",91461,550000,103],["Dallas",65754,320000,101],["San Antonio",58291,260000,92]],
+  "Florida":[["Miami",54858,580000,123],["Orlando",67402,390000,104],["Tampa",71091,420000,105],["Jacksonville",65935,300000,96]],
+  "New York":[["New York City",79713,780000,187],["Buffalo",45739,180000,90],["Rochester",43771,160000,89],["Albany",55382,240000,100]],
+  "Idaho":[["Boise City",74537,450000,108],["Nampa",64384,380000,99],["Idaho Falls",62015,330000,93]],
+  "Illinois":[["Chicago",71673,330000,107],["Aurora",83507,300000,99],["Naperville",135120,520000,112]],
+  "Washington":[["Seattle",120608,880000,150],["Spokane",62265,400000,100],["Tacoma",79195,480000,112]],
+  "Ohio":[["Columbus",65232,250000,95],["Cleveland",37271,120000,88],["Cincinnati",51938,230000,92]]
+};
+
+const fmtM=n=>n>=1e9?'$'+(n/1e9).toFixed(2)+'B':'$'+(n/1e6).toFixed(1)+'M';
+const num=n=>Math.round(n).toLocaleString();
+
+let GAME='pb', JACK=200000000, sortA='worst', sortB='best';
+
+// dropdown
+const sel=document.getElementById('state');
+[...S].sort((a,b)=>a[0].localeCompare(b[0])).forEach(s=>{const o=document.createElement('option');o.value=s[0];o.textContent=s[0];sel.appendChild(o);});
+sel.value="Texas";
+const citySel=document.getElementById('city');
+function populateCities(){
+  const c=CITY[sel.value]||[];
+  citySel.innerHTML='<option value="">Statewide average</option>';
+  c.forEach(x=>{const o=document.createElement('option');o.value=x[0];o.textContent=x[0];citySel.appendChild(o);});
+  citySel.disabled=c.length===0; citySel.style.opacity=c.length===0?.5:1;
+}
+populateCities();
+
+// toggles
+document.querySelectorAll('#game button').forEach(b=>b.onclick=()=>{document.querySelectorAll('#game button').forEach(x=>x.classList.remove('on'));b.classList.add('on');GAME=b.dataset.v;render();});
+document.querySelectorAll('#jackpot button').forEach(b=>b.onclick=()=>{document.querySelectorAll('#jackpot button').forEach(x=>x.classList.remove('on'));b.classList.add('on');JACK=+b.dataset.v;render();});
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('on'));b.classList.add('on');
+  document.getElementById('pane-can').classList.toggle('hidden',b.dataset.tab!=='can');
+  document.getElementById('pane-lost').classList.toggle('hidden',b.dataset.tab!=='lost');
+});
+document.querySelectorAll('[data-sortA]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-sortA]').forEach(x=>x.classList.remove('on'));b.classList.add('on');sortA=b.dataset.sorta;renderA();});
+document.querySelectorAll('[data-sortB]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-sortB]').forEach(x=>x.classList.remove('on'));b.classList.add('on');sortB=b.dataset.sortb;renderB();});
+sel.onchange=()=>{populateCities();render();};
+citySel.onchange=render;
+
+function calc(s){
+  const cash=JACK*RATIO[GAME];
+  const fed=cash*FED;
+  const rate=s[idx.rate]+s[idx.local];
+  const stateLost=cash*rate;
+  const totalLost=fed+stateLost;
+  const keep=cash-totalLost;
+  return {cash,fed,rate,stateLost,totalLost,keep};
+}
+
+function renderWidget(){
+  const s=S.find(x=>x[0]===sel.value);
+  const c=calc(s);
+  document.getElementById('takehome').textContent=fmtM(c.keep);
+  document.getElementById('lost').textContent=fmtM(c.totalLost);
+  document.getElementById('takesub').textContent=`of the ${fmtM(c.cash)} cash value, after all tax`;
+  document.getElementById('lostsub').textContent=`federal ${fmtM(c.fed)} + state ${fmtM(c.stateLost)}`;
+  // city overrides for comparisons
+  let income=s[idx.income],home=s[idx.home],col=s[idx.col];
+  const cityName=citySel.value;
+  if(cityName){const cd=(CITY[s[0]]||[]).find(x=>x[0]===cityName);if(cd){income=cd[1];home=cd[2];col=cd[3];}}
+  const rent=s[idx.rent],tuition=s[idx.tuition],childcare=s[idx.childcare];
+  // ranks
+  const valList=S.map(x=>({n:x[0],v:calc(x).keep/((x[idx.col])/100)})).sort((a,b)=>b.v-a.v);
+  const lostList=S.map(x=>({n:x[0],v:calc(x).totalLost})).sort((a,b)=>b.v-a.v);
+  const vPos=valList.findIndex(x=>x.n===s[0])+1, lPos=lostList.findIndex(x=>x.n===s[0])+1;
+  document.getElementById('valrank').innerHTML=`Goes furthest: ranks <b>#${vPos}</b> of ${S.length}`;
+  document.getElementById('lostrank').innerHTML=`Lost to tax: ranks <b>#${lPos}</b> of ${S.length} (1 = most lost)`;
+
+  // city/state land + annual living cost
+  const land=LAND[s[0]]||5000;
+  const annualSpend=US_ANNUAL_SPEND*(col/100);
+  const degreeCost=tuition*4; // full 4-year degree
+
+  // TAB 1: purchasing power (durable assets / freedom) — uses TAKE-HOME
+  const keep=c.keep;
+  document.getElementById('grid-can').innerHTML=`
+    ${card(num(keep/home),'<b>homes</b> bought outright',`at $${(home/1000).toFixed(0)}K median${cityName?' ('+cityName+')':''}`,false)}
+    ${card(num(keep/land),'<b>acres of land</b>',`at ~$${(land/1000).toFixed(1)}K/acre in ${s[0]}`,false)}
+    ${card(num(keep/annualSpend),'<b>years</b> you could live without working',`at $${(annualSpend/1000).toFixed(0)}K/yr local cost`,false)}`;
+
+  // TAB 2: what tax cost (recurring / time-based) — uses TOTAL LOST
+  const lost=c.totalLost;
+  document.getElementById('grid-lost').innerHTML=`
+    ${card(num(lost/rent),'<b>years of rent</b>',`at $${(rent/12).toFixed(0)}/mo${cityName?' ('+cityName+')':''}`,true)}
+    ${card(num(lost/childcare),'<b>years of childcare</b>',`at $${(childcare/1000).toFixed(1)}K/yr`,true)}
+    ${card(num(lost/degreeCost),'full <b>4-year degrees</b> funded',`at $${(degreeCost/1000).toFixed(0)}K each (4 yrs)`,true)}
+    ${card(num(lost/income),'<b>years of an average salary</b>',`at $${(income/1000).toFixed(0)}K/yr`,true)}`;
+}
+function card(big,lbl,sub,lost){
+  return `<div class="ccard ${lost?'lost':''}"><div class="cbig">${big}</div><div class="clbl">${lbl}</div><div class="csub">${sub}</div></div>`;
+}
+
+function renderIntl(){
+  const cash=JACK*RATIO[GAME];
+  const usBest=cash*(1-FED);
+  const nyc=S.find(x=>x[0]==='New York City');
+  const usWorst=cash*(1-FED-(nyc[idx.rate]+nyc[idx.local]));
+  const rows=[["UK / Canada / Australia",cash,"ikeep"],["US — best state",usBest,"ius"],["US — worst (NYC)",usWorst,"ius"]];
+  const box=document.getElementById('intlbars');box.innerHTML='';
+  rows.forEach(r=>{const pct=r[1]/cash*100;const d=document.createElement('div');d.className='ibar';
+    d.innerHTML=`<div class="iname">${r[0]}</div><div class="itrack"><div class="ifill ${r[2]}" style="width:${pct}%">${Math.round(pct)}% kept</div></div><div class="iamt">${fmtM(r[1])}</div>`;
+    box.appendChild(d);});
+}
+
+function renderA(){
+  const cash=JACK*RATIO[GAME];
+  let data=S.map(s=>{const c=calc(s);return {name:s[0],totalLost:c.totalLost,fed:c.fed,stateLost:c.stateLost,
+    rent:s[idx.rent],childcare:s[idx.childcare],degree:s[idx.tuition]*4,income:s[idx.income]};});
+  data.sort((a,b)=>sortA==='worst'?b.totalLost-a.totalLost:a.totalLost-b.totalLost);
+  const tb=document.getElementById('tbodyA');tb.innerHTML='';
+  data.forEach((d,i)=>{
+    const fedPct=d.fed/d.totalLost*100, staPct=d.stateLost/d.totalLost*100;
+    const stateTxt=d.stateLost>0?`+ <span class="sp">${fmtM(d.stateLost)}</span>`:`+ <span style="color:var(--green)">$0</span>`;
+    const tr=document.createElement('tr'); if(d.name===sel.value)tr.className='me';
+    tr.innerHTML=`<td class="rk">${i+1}</td><td class="st">${d.name}</td>
+      <td><div class="brk"><span class="fp">${fmtM(d.fed)}</span> ${stateTxt} = <b style="color:var(--ink)">${fmtM(d.totalLost)}</b>
+        <span class="stackbar"><span class="fed" style="width:${fedPct}%"></span><span class="sta" style="width:${staPct}%"></span></span></div></td>
+      <td style="color:var(--muted);font-weight:600">${num(d.totalLost/d.rent)}</td>
+      <td style="color:var(--muted);font-weight:600">${num(d.totalLost/d.childcare)}</td>
+      <td style="color:var(--muted);font-weight:600">${num(d.totalLost/d.degree)}</td>
+      <td style="color:var(--muted);font-weight:600">${num(d.totalLost/d.income)}</td>`;
+    tb.appendChild(tr);
+  });
+}
+
+function renderB(){
+  let data=S.map(s=>{const c=calc(s);const col=s[idx.col];return {name:s[0],keep:c.keep,col,rate:c.rate,realValue:c.keep/(col/100),
+    home:s[idx.home],land:LAND[s[0]]||5000,annual:US_ANNUAL_SPEND*(col/100)};});
+  data.sort((a,b)=>sortB==='best'?b.realValue-a.realValue:a.realValue-b.realValue);
+  const tb=document.getElementById('tbodyB');tb.innerHTML='';
+  data.forEach((d,i)=>{
+    const tr=document.createElement('tr'); if(d.name===sel.value)tr.className='me';
+    const rateTxt=d.rate>0?`${(d.rate*100).toFixed(2)}%`:`<span style="color:var(--green)">0%</span>`;
+    tr.innerHTML=`<td class="rk">${i+1}</td><td class="st">${d.name}</td>
+      <td style="font-weight:800;color:var(--gold)">${fmtM(d.realValue)}</td>
+      <td style="font-weight:700">${fmtM(d.keep)}</td>
+      <td style="color:var(--muted);font-weight:600">${num(d.keep/d.home)}</td>
+      <td style="color:var(--muted);font-weight:600">${num(d.keep/d.land)}</td>
+      <td style="color:var(--muted);font-weight:600">${num(d.keep/d.annual)}</td>
+      <td style="font-weight:600">${rateTxt}</td>`;
+    tb.appendChild(tr);
+  });
+}
+
+function render(){renderWidget();renderIntl();renderA();renderB();}
+render();
+</script>
+</body>
+</html>
